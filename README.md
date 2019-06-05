@@ -1,5 +1,4 @@
 # GraFX
-# WARNING: this library is under active development is in a pre-alpha version
 
 GraFX is a header-only libraries set based on glfw3 and providing the same set of features as exact glfw3 and additional features such as loading graphics from files. The main difference between glfw3 and GraFX is that GraFX is OOP-designed and mostly uses Modern C++ (11, 14, 17) features in opposite to the pure C-styled library glfw3.
 
