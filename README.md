@@ -11,6 +11,7 @@ ACTUAL DEPENDENCIES:
  - STL (just standard library, - see the C++ features the library uses)
   
 PLANNED DEPENDENCIES (PROBABLY, NOT USED FOR THE MOMENT, BUT PROBABLY WOULD BE IN THE FUTURE):  
+ - (???)  GLFM (https://github.com/brackeen/glfm)
  - (???)  Nuklear (https://github.com/vurtun/nuklear) 
  - (???)  OpenImageIO (https://sites.google.com/site/openimageio/home)
  - (???)  Glbinding (https://github.com/cginternals/glbinding)
