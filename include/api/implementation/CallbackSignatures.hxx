@@ -1,5 +1,5 @@
 #pragma once
-#include "ObserverCore.hpp"
+#include "api/basic_observers/basic/ObserverCore.hpp"
 #include "Constants.hxx"
 
 
@@ -49,6 +49,11 @@ namespace callbacks {
 	using is_iconified = int;
 	using on_iconify_cb = void(*)(iconified_window, is_iconified);
 
+	//==========================/ON_WINDOW_MAXIMIZED + 
+	using maximized_window = GLFWwindow * ;
+	using is_maximized = int;
+	using on_maximize_cb = void(*)(maximized_window, is_maximized);
+
 
 	//==========================/ON_WINDOW_FRAMEBUFFER_RESIZED +
 	using window_wich_framebuffer = GLFWwindow * ;
@@ -56,6 +61,11 @@ namespace callbacks {
 	using to_framebuffer_height = int;
 	using on_framebuffer_resized_cb = void(*)(window_wich_framebuffer, to_framebuffer_width, to_framebuffer_height);
 
+	//==========================/ON_WINDOW_CONTENT_SCALED +
+	using window_wich_content_was_scaled = GLFWwindow * ;
+	using to_scale_x = float;
+	using to_scale_y = float;
+	using on_content_scaled_cb = void(*)(window_wich_content_was_scaled, to_scale_x, to_scale_y);
 
 	//==========================/ON_MOUSE_BUTTON input
 	using window_receiver = GLFWwindow * ;

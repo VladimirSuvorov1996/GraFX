@@ -4,6 +4,8 @@ namespace graFX {
 	//An utility class, to interoperate with glfw 
 	class Key {
 	public:
+		using name_t = gsl::czstring;
+		using scan_code_t = int;
 		constexpr Key() = delete;
 		constexpr Key(const Key&) = default;
 		enum key : uint8_t {
@@ -106,6 +108,15 @@ namespace graFX {
 
 		constexpr static glfw::key_t code(key key) noexcept {
 			return glfw::keys[key];
+		}
+
+
+
+		name_t name()const {
+			return (GraFX::is_valid())?glfwGetKeyName(code(), scan_code()):nullptr;
+		}
+		scan_code_t scan_code()const {
+			return (GraFX::is_valid())?glfwGetKeyScancode(code()):0;
 		}
 	private:
 		constexpr static key from_glfw_key(glfw::key_t glfw_key) {

@@ -1,7 +1,6 @@
 #pragma once
 #include "Constants.hxx"
-namespace graFX::window {
-	using Window_t = Window;
+namespace graFX {
 
 	class CreationParameter {
 	public:

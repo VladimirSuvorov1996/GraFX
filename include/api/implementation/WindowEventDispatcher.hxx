@@ -33,7 +33,12 @@ namespace graFX::window {
 		using on_refresh_cb = callbacks::on_refresh_cb;
 		using on_focus_cb = callbacks::on_focus_cb;
 		using on_iconify_cb = callbacks::on_iconify_cb;
+		using on_maximize_cb = callbacks::on_maximize_cb;
+
+
 		using on_framebuffer_resized_cb = callbacks::on_framebuffer_resized_cb;
+		using on_content_scaled_cb = callbacks::on_content_scaled_cb;
+
 		using on_file_s_dropped_cb = callbacks::on_file_s_dropped_cb;
 
 
@@ -41,29 +46,35 @@ namespace graFX::window {
 		//TODO: Substitute following with listeners *observers*
 
 		on_move_cb on_move(on_move_cb callback) {
-			return (is_valid()) ? glfwSetWindowPosCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetWindowPosCallback, on_move_cb>(nullptr, window_handle_, callback);
 		}
 		on_resize_cb on_resize(on_resize_cb callback) {
-			return (is_valid()) ? glfwSetWindowSizeCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetWindowSizeCallback, on_resize_cb>(nullptr, window_handle_, callback);
 		}
 		on_close_cb on_close(on_close_cb callback) {
-			return (is_valid()) ? glfwSetWindowCloseCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetWindowCloseCallback, on_close_cb>(nullptr, window_handle_, callback);
 		}
 		on_refresh_cb on_refresh(on_refresh_cb callback) {
-			return (is_valid()) ? glfwSetWindowRefreshCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetWindowRefreshCallback, on_refresh_cb>(nullptr, window_handle_, callback);
 		}
 		on_focus_cb on_focus(on_focus_cb callback) {
-			return (is_valid()) ? glfwSetWindowFocusCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetWindowFocusCallback, on_focus_cb>(nullptr, window_handle_, callback);
 		}
 		on_iconify_cb on_iconify(on_iconify_cb callback) {
-			return (is_valid()) ? glfwSetWindowIconifyCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetWindowIconifyCallback, on_iconify_cb>(nullptr, window_handle_, callback);
+		}
+		on_maximize_cb on_maximize(on_maximize_cb callback) {
+			return invoke_get<glfwSetWindowMaximizeCallback, on_maximize_cb>(nullptr, window_handle_, callback);
 		}
 		on_framebuffer_resized_cb on_framebuffer_resized(on_framebuffer_resized_cb callback) {
-			return (is_valid()) ? glfwSetFramebufferSizeCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetFramebufferSizeCallback, on_framebuffer_resized_cb>(nullptr, window_handle_, callback);
+		}
+		on_content_scaled_cb on_content_scaled(on_content_scaled_cb callback) {
+			return invoke_get<glfwSetWindowContentScaleCallback, on_content_scaled_cb>(nullptr, window_handle_, callback);
 		}
 
 		on_file_s_dropped_cb on_file_s_dropped(on_file_s_dropped_cb callback) {
-			return (is_valid()) ? glfwSetDropCallback(window_handle_, callback) : nullptr;
+			return invoke_get<glfwSetDropCallback, on_file_s_dropped_cb>(nullptr, window_handle_, callback);
 		}
 
 	};

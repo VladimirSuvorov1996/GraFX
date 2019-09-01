@@ -1,6 +1,6 @@
 #pragma once
 #include <GLFW\glfw3.h>
-#include "ObserverCore.hpp"
+#include "api/basic_observers/basic/ObserverCore.hpp"
 class Clock {
 public:
 	using seconds = double;

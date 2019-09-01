@@ -1,7 +1,7 @@
 #pragma once
 #include "window_handle.hxx"
 #include "GraFX.hxx"
-#include "ObserverCore.hpp"
+#include "api/basic_observers/basic/ObserverCore.hpp"
 #include "CallbackSignatures.hxx"
 #include "Monitor.hxx"
 #include "WindowKeyboard.hxx"
@@ -12,20 +12,43 @@
 
 
 namespace graFX {
+	namespace details {
+		//WindowScopedHandle changes window handle to specifed, until scope will be not exited.
+		//At scope exit, restores previous window handle.
+
+		template<class DerivedWindow>
+		struct WindowTraits {
+			using data_reference = DerivedWindow&;
+			using handle_type = typename DerivedWindow::window_handle_t;
+
+			static handle_type get_handle(data_reference data) {
+				return data.window_handle_;
+			}
+			static void set_handle(data_reference data, handle_type handle) {
+				data.window_handle_ = handle;
+			}
+		};
+
+		template<class DerivedWindow>
+		using WindowScopedHandle = ScopedHandle<WindowTraits<DerivedWindow>>;
+	}
 	class CurrentContext;
 
+
+	
 	class Window /*:
 		protected WindowBased*/ {
-		using window_handle_t = window_handle_t;
-		window_handle_t window_handle_ = nullptr;
 	public:
+		using window_handle_t = window_handle_t;
 		using Keyboard = window::Keyboard;
 		using Mouse = window::Mouse;
 		using Properties = window::Properties;
 		using EventDispatcher = window::EventDispatcher;
-		using CreationParameter = window::CreationParameter;
+		using CreationParameter = CreationParameter;
 
-
+	private:
+		window_handle_t window_handle_ = nullptr;
+	public:
 
 		Keyboard keyboard() { return { window_handle_ }; }
 		Mouse mouse() { return { window_handle_ }; }
@@ -43,10 +66,7 @@ namespace graFX {
 		{
 			src.window_handle_ = nullptr;
 		}
-		~Window() {
-			if (GraFX::is_valid() && window_handle_)
-				glfwDestroyWindow(window_handle_);
-		}
+		~Window() { invoke_set<glfwDestroyWindow>(window_handle_);  }
 		//to a monitor create
 		bool create(int width, int height, const char* title, Monitor* monitor=nullptr)	{
 			if (GraFX::is_valid()) {
@@ -56,39 +76,51 @@ namespace graFX {
 			return is_open();
 		}
 		void close() {
-			if (is_open())glfwDestroyWindow(window_handle_);
+			invoke_set<glfwDestroyWindow>(window_handle_);
 			window_handle_ = nullptr;
 		}
 		bool is_open()const { return (GraFX::is_valid()) ? (nullptr != window_handle_) : false; }
 
-
+		void request_attention() {
+			invoke_set<glfwRequestWindowAttention>(window_handle_);
+		}
 
 		static CurrentContext get_current_context();
 		static void set_creation_parameter(CreationParameter parameter)	{
 			glfwWindowHint(parameter.hint(), parameter.value());
 		}
-		static void reset_creation_parameters() { glfwDefaultWindowHints(); }
-		CreationParameter creation_parameter(CreationParameter parameter)const {
-			if (!is_open())return parameter;
-			parameter = glfwGetWindowAttrib(window_handle_, parameter.hint());
-			return parameter;
+
+		//TODO: DECIDE if the function required
+		static void set_string_creation_parameter(int key, gsl::czstring value) {
+			glfwWindowHintString(key, value);
 		}
+
+		static void reset_creation_parameters() { glfwDefaultWindowHints(); }
+		
 
 		//~CREATION
 
-		void render() { if (is_open())glfwSwapBuffers(window_handle_); }
-		void iconify() { if (is_open())glfwIconifyWindow(window_handle_); }
-		void maximize() { if (is_open())glfwMaximizeWindow(window_handle_); }
+		void render() { invoke_set<glfwSwapBuffers>(window_handle_); }
 
-		void restore() { if (is_open())glfwRestoreWindow(window_handle_); }
-		void set_context_current() { if (is_open())glfwMakeContextCurrent(window_handle_); }
-		void focus() { if (is_open())glfwFocusWindow(window_handle_); }
+
+		static void set_render_interval(int interval) { glfwSwapInterval(interval); }
+
+		void iconify() { invoke_set<glfwIconifyWindow>(window_handle_); }
+		void maximize() { invoke_set<glfwMaximizeWindow>(window_handle_); }
+		void restore() { invoke_set<glfwRestoreWindow>(window_handle_); }
+		void set_context_current() { invoke_set<glfwMakeContextCurrent>(window_handle_); }
+		void focus() { invoke_set<glfwFocusWindow>(window_handle_); }
 		
 
 	protected:
+		template<auto callable, typename...Ts>
+		void invoke_set(Ts&&...as) {
+			if (is_open())std::invoke(callable, std::forward<Ts>(as)...);
+		}
+
 		Window(window_handle_t handle) :window_handle_(handle) {}
 	protected:
-		friend class details::ScopedHandle<Window>; //the main friend
+		friend details::WindowTraits<Window>; //the main friend
 		friend class CurrentContext; 
 	};
 
@@ -104,6 +136,9 @@ namespace graFX {
 		CurrentContext(CurrentContext&&) = default;
 		~CurrentContext() {
 			current_context_window_.window_handle_ = nullptr;
+		}
+		void swapInterval(int interval) {
+			glfwSwapInterval(interval);
 		}
 
 		current_context_window_ref_t operator*() noexcept { return current_context_window_; }
@@ -128,7 +163,7 @@ namespace graFX {
 
 	class WindowMaker {//builder pattern
 	public:
-		using CreationParameter = graFX::window::CreationParameter;
+		using CreationParameter = graFX::CreationParameter;
 		using this_reference = WindowMaker &;
 		CreationParameter& operator[](size_t index) {
 			return creation_parameters_[index];
@@ -148,18 +183,21 @@ namespace graFX {
 		}
 
 		Window make() {
-			initialize_creation_parameters();
-			return Window();
+			return make_window();
 		}
 		Window make(Window&& src) {
-			initialize_creation_parameters();
-			return Window(std::move(src));
+			return make_window(std::move(src));
 		}
 		Window make(int width, int height, const char* title, Monitor* monitor = nullptr) {
-			initialize_creation_parameters();
-			return Window(width, height, title, monitor);
+			return make_window(width, height, title, monitor);
 		}
 	private:
+		template<typename...Ts>
+		Window make_window(Ts&&...as) {			
+			initialize_creation_parameters();
+			return Window(std::forward<Ts>(as)...);
+		}
+
 		void initialize_creation_parameters() {
 			Window::reset_creation_parameters();
 			for (auto& creation_parameter : creation_parameters_)
@@ -169,7 +207,7 @@ namespace graFX {
 		std::vector<CreationParameter> creation_parameters_;
 		friend WindowMaker& operator<<(WindowMaker& maker, const CreationParameter& parameter);
 	};
-	WindowMaker& operator<<(WindowMaker& maker, const graFX::window::CreationParameter& parameter) {
+	WindowMaker& operator<<(WindowMaker& maker, const graFX::CreationParameter& parameter) {
 		maker.creation_parameters_.emplace_back(parameter);
 		return maker;
 	}
@@ -179,5 +217,5 @@ namespace graFX {
 	}
 }
 namespace graFX::details {
-	using ScopedHandle_t = ScopedHandle<Window>;
+	using WindowScopedHandle_t = WindowScopedHandle<Window>;
 }

@@ -1,10 +1,16 @@
 #pragma once
 #include <gsl-lite.hpp>
 #include "CallbackSignatures.hxx"
+#include "../implementation/CreationParameter.hxx"
 
 namespace graFX {
 	class GraFX {
 	public:
+		using procedure_name_t = gsl::czstring;
+		static auto get_procedure_address(procedure_name_t procedure_name) {
+			return glfwGetProcAddress(procedure_name);
+		}
+
 		//if we can use 
 		static bool is_valid() { return is_valid_; }
 		//true if initialized with the call, 
@@ -14,6 +20,10 @@ namespace graFX {
 			is_valid_ = (glfwInit() == true);
 			return is_valid_;
 		}
+		static void set_parameter(CreationParameter parameter) {
+			glfwInitHint(parameter.hint(), parameter.value());
+		}
+
 		//true if invalidated with the call,
 		//false - any other case
 		static bool dispose() {
@@ -28,11 +38,7 @@ namespace graFX {
 		~GraFX() { dispose(); }
 
 
-		struct version_t {
-			int major,
-				minor,
-				revision;
-		};
+		struct version_t { int major, minor, revision; };
 		static version_t get_version() {
 			version_t ver_info;
 			glfwGetVersion(&ver_info.major, &ver_info.minor, &ver_info.revision);
@@ -73,11 +79,24 @@ namespace graFX {
 		struct Size { T w, h; } size;
 
 	};
+	template<typename T>
+	union graphic_output_trect2 {
+		struct { T x, y, w, h; };
+		struct {
+			struct Position { T x, y; } position;
+			struct Size { T w, h; } size;
+		};
+	};
+
 
 
 	using graphic_output_tvec2i = graphic_output_tvec2<int>;
+	using graphic_output_tvec2f = graphic_output_tvec2<float>;
+	using graphic_output_trect2i = graphic_output_trect2<int>;
 
 	static_assert(sizeof(graphic_output_tvec2i) == (2 * sizeof(int)));
+	static_assert(sizeof(graphic_output_tvec2f) == (2 * sizeof(float)));
+	static_assert(sizeof(graphic_output_trect2i) == (4 * sizeof(int)));
 #ifndef GRAFX_DONT_USE_AUTOINITIALIZE
 	namespace {
 		static GraFX graphics;
