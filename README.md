@@ -11,11 +11,12 @@ ACTUAL DEPENDENCIES:
  - STL (just standard library, - see the C++ features the library uses)
   
 PLANNED DEPENDENCIES (PROBABLY, NOT USED FOR THE MOMENT, BUT PROBABLY WOULD BE IN THE FUTURE):  
- (???)  Nuklear (https://github.com/vurtun/nuklear) 
- (???)  OpenImageIO (https://sites.google.com/site/openimageio/home)
- (???)  Glbinding (https://github.com/cginternals/glbinding)
- (???)  Globjects (https://github.com/cginternals/globjects)
+ - (???)  Nuklear (https://github.com/vurtun/nuklear) 
+ - (???)  OpenImageIO (https://sites.google.com/site/openimageio/home)
+ - (???)  Glbinding (https://github.com/cginternals/glbinding)
+ - (???)  Globjects (https://github.com/cginternals/globjects)
  
+Sign "(???)" - means that the decision isn't made yet. Amount of question signs ("?") says, how far the decision from being made.
 
 WARNING: The project is under active development and is in a pre-alpha version, therefore it has uncomplete functionality, and (somewhere) it's organized in unstructured order and there is a lack of tests, documentation and examples. Please notice, that all those problems are temporary and will be fixed in fututre versions.
 
