@@ -12,30 +12,62 @@ using fmt::report_system_error;
 #include "api/Clock.hpp"
 
 #include "api/Joystic.hpp"
-#include "api/JoysticBasicObserver.hpp"
+#include "api/basic_observers/JoysticBasicObserver.hpp"
 
 #include "api/Monitor.hpp"
 #include "api/EventDispatcher.hpp"
-#include "api/CallbackSignatures.hpp"
-#include "api/ResizeBasicObserver.hpp"
+#include "api/basic_observers/basic/CallbackSignatures.hpp"
+#include "api/basic_observers/ResizeBasicObserver.hpp"
 #include "api/CreationParameter.hpp"
 #include "api/Action.hpp"
 #include "api/Connection.hpp"
 
-#include "api/CursorMovedBasicObserver.hpp"
-#include "api/CursorEnteredBasicObserver.hpp"
+#include "api/basic_observers/CursorMovedBasicObserver.hpp"
+#include "api/basic_observers/CursorEnteredBasicObserver.hpp"
 
-#include "api/ScrollBasicObserver.hpp"
-#include "api/MouseButtonBasicObserver.hpp"
+#include "api/basic_observers/ScrollBasicObserver.hpp"
+#include "api/basic_observers/MouseButtonBasicObserver.hpp"
 
-#include "api/KeyBasicObserver.hpp"
-#include "api/CharBasicObserver.hpp"
-#include "api/ModifiedCharBasicObserver.hpp"
-#include "api/File_s_DroppedBasicObserver.hpp"
+#include "api/basic_observers/KeyBasicObserver.hpp"
+#include "api/basic_observers/CharBasicObserver.hpp"
+#include "api/basic_observers/ModifiedCharBasicObserver.hpp"
+#include "api/basic_observers/File_s_DroppedBasicObserver.hpp"
 
+
+#include "api/basic_observers/ContentScaledBasicObserver.hpp"
+#include "api/basic_observers/MaximizeBasicObserver.hpp"
+
+#include "api/basic_observers/MonitorConnectedBasicObserver.hpp"
+#include "api/basic_observers/ErrorBasicObserver.hpp"
+
+class MonConnObserver {
+public:
+	void on_con(graFX::Monitor m, bool is_conn) {
+		
+	}
+};
+
+class ErrObserver {
+public:
+	void on_err(int code, std::string_view dsc) {
+		
+	}
+
+};
+
+GRAFX_REGISTRATE_OBSERVER_AS(ErrorBasicObserver, ErrObserver, on_err, EObserver);
+GRAFX_REGISTRATE_OBSERVER_AS(MonitorConnectedBasicObserver, MonConnObserver, on_con, MCObserver);
 graFX::Window makeWindow() {
 	using namespace graFX;
-	Monitor m(365);//NOTE: there is no 365-th monitor, but code works correctly
+	EObserver eo;
+	GraFX::on_error(eo);
+
+	Monitor mon(0);
+	MCObserver mcob;
+	Monitor::on_monitor_connected(mcob);
+
+
+	//Monitor m(365);//NOTE: there is no 365-th monitor, but code works correctly
 	WindowMaker maker;
 
 	return maker
@@ -44,8 +76,9 @@ graFX::Window makeWindow() {
 		<< ProfileMode{ ProfileMode::AnyProfile }
 		<< Resizable{}
 		<< Focused{}
+		<< Maximized{}
 	<< [&](auto& mk) {
-		auto w = mk.make(320, 280, "TheWindow", &m);
+		auto w = mk.make(320, 280, "TheWindow", &mon);
 		w.set_context_current();
 		w.focus();
 		return w;
@@ -64,11 +97,10 @@ GRAFX_REGISTRATE_OBSERVER_AS(File_s_DroppedBasicObserver, CustomObserver, on_fil
 
 #include <Windows.h>
 
-//TODO: Monitor listeners
-//TODO: GraFX Error listeners
 //TODO: Swap interval user pointer
 //TODO: make proper support for structs CURSOR IMAGE VIDEOMODE GAMMARAMP WINDOW PROC ADDRESS e.t.c.
-
+//TODO: <Window/Monitor>Traits -> to Window/Monitor
+//TODO: Error Class for (GLFW_BLA_BLA_BLA_ERROR) (like Action, Key, Etc)
 
 class CustomJoysticObserver {
 public:
@@ -79,15 +111,30 @@ public:
 
 GRAFX_REGISTRATE_OBSERVER_AS(JoysticBasicObserver, CustomJoysticObserver, on_joyconnected, JObserver);
 
+
+
 int main(int argc, char* argv[]) {
 	SetConsoleCP(1251);//to test if files are dropped, 
 	SetConsoleOutputCP(1251);//UTF encoding
 	setlocale(LC_ALL, "RUS");//must be enabled;
 
 
+
+
 	using namespace graFX;
 
+	Monitor mon(345);
+	//std::cout<<"is_connected "<<mon.is_connected()<<std::endl;
+	auto vs = mon.available_videomodes();
+	std::cout<<"available_videomodes "<<vs.size()<<std::endl;
+	
+	auto s = mon.physical_size();
+	std::cout<<"physical_size "<<s.h<<std::endl;
+
+
 	Joystic j(0);
+	
+	std::cout<<"GUID: "<<j.GUID()<<std::endl;
 
 	JObserver jo;
 	j.on_joystic_connected(jo);
@@ -99,7 +146,9 @@ int main(int argc, char* argv[]) {
 	assert(ps.size());
 
 	Window w = makeWindow();
-
+	std::cout<<"Monitor is_connected: "<<w.properties().monitor().is_connected()<<std::endl;
+	std::cout<<"Monitor name: "<<w.properties().monitor().name()<<std::endl;
+	w.properties().monitor(mon, {0,0,320,240}, 60);
 	assert(Window::get_current_context()->is_open());
 
 
@@ -116,8 +165,11 @@ int main(int argc, char* argv[]) {
 
 	for (; w.is_open(); w.eventDispatcher().poll_events()) {
 		w.render();
-		if (w.keyboard().is_key_pressed(Key::Escape))
+		if (w.keyboard().is_key_pressed(Key::Space)) {	
+			w.request_attention();
+		}
+		if (w.keyboard().is_key_pressed(Key::Escape)) {	
 			w.close();
-		
+		}
 	};
 }
