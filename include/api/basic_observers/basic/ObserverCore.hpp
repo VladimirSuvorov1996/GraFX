@@ -19,6 +19,7 @@ namespace graFX::input::observer_core {
 				observers_.erase(found, found + 1);
 			else observers_.shrink_to_fit();
 		}
+
 		const C<T>& view()const noexcept {
 			return observers_;
 		}

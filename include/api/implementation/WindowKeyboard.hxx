@@ -9,11 +9,11 @@ namespace graFX::window {
 		Keyboard(window_handle_ref_t base) : WindowBased(base) {}
 
 		bool sticky_keys()const {
-			return (is_valid()) ? glfwGetInputMode(window_handle_, glfw::input_modes[StickyKeys]) : false;
+			return (is_valid()) ? glfwGetInputMode(window_handle_, glfw::input_modes[to_index(Mode::StickyKeys)]) : false;
 		}
 		void sticky_keys(bool enabled) {
 			if (is_valid())
-				glfwSetInputMode(window_handle_, glfw::input_modes[StickyKeys], enabled);
+				glfwSetInputMode(window_handle_, glfw::input_modes[to_index(Mode::StickyKeys)], enabled);
 		}
 
 
@@ -24,8 +24,6 @@ namespace graFX::window {
 		
 
 
-
-		//TODO: substitute following with listeners
 		using on_key_cb = callbacks::on_key_cb;
 		using on_char_entered_cb = callbacks::on_char_entered_cb;
 		using on_char_with_modifier_entered_cb = callbacks::on_char_with_modifier_entered_cb;

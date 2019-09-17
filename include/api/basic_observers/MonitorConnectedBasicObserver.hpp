@@ -2,6 +2,7 @@
 #include "../Monitor.hpp"
 #include "basic/AutosubscribableObserver.hpp"
 #include "basic/ImplementationDependentObserver.hpp"
+#include "../implementation/ScopedHandle.hxx"
 namespace graFX::input {
 	template<typename Implementation, auto invoke>
 	class MonitorConnectedBasicObserver :
@@ -19,7 +20,7 @@ namespace graFX::input {
 				void, Monitor&, bool>;
 
 			Monitor current_monitor;
-			details::MonitorScopedHandle_t scope(current_monitor, m);
+			GRAFX_CAPTURE_SCOPED_HANDLE(current_monitor, m);
 			base_t::invoke_callback(current_monitor, is_connected);
 		}
 	};

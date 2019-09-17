@@ -12,30 +12,8 @@
 
 
 namespace graFX {
-	namespace details {
-		//WindowScopedHandle changes window handle to specifed, until scope will be not exited.
-		//At scope exit, restores previous window handle.
-
-		template<class DerivedWindow>
-		struct WindowTraits {
-			using data_reference = DerivedWindow&;
-			using handle_type = typename DerivedWindow::window_handle_t;
-
-			static handle_type get_handle(data_reference data) {
-				return data.window_handle_;
-			}
-			static void set_handle(data_reference data, handle_type handle) {
-				data.window_handle_ = handle;
-			}
-		};
-
-		template<class DerivedWindow>
-		using WindowScopedHandle = ScopedHandle<WindowTraits<DerivedWindow>>;
-	}
 	class CurrentContext;
 
-
-	
 	class Window /*:
 		protected WindowBased*/ {
 	public:
@@ -84,7 +62,7 @@ namespace graFX {
 		void request_attention() {
 			invoke_set<glfwRequestWindowAttention>(window_handle_);
 		}
-
+	public:
 		static CurrentContext get_current_context();
 		static void set_creation_parameter(CreationParameter parameter)	{
 			glfwWindowHint(parameter.hint(), parameter.value());
@@ -111,7 +89,18 @@ namespace graFX {
 		void set_context_current() { invoke_set<glfwMakeContextCurrent>(window_handle_); }
 		void focus() { invoke_set<glfwFocusWindow>(window_handle_); }
 		
+		struct traits {
+			using reference		= Window&;
+			using pointer		= Window*;
+			using handle_type	= typename Window::window_handle_t;
 
+			static handle_type get_handle(reference data) {
+				return data.window_handle_;
+			}
+			static void set_handle(reference data, handle_type handle) {
+				data.window_handle_ = handle;
+			}
+		};
 	protected:
 		template<auto callable, typename...Ts>
 		void invoke_set(Ts&&...as) {
@@ -120,7 +109,7 @@ namespace graFX {
 
 		Window(window_handle_t handle) :window_handle_(handle) {}
 	protected:
-		friend details::WindowTraits<Window>; //the main friend
+		//friend details::WindowTraits<Window>; //the main friend
 		friend class CurrentContext; 
 	};
 
@@ -215,7 +204,4 @@ namespace graFX {
 	auto operator<<(WindowMaker& to, Callable callable)->decltype(std::invoke(callable, to)) {
 		return std::invoke(callable, to);
 	}
-}
-namespace graFX::details {
-	using WindowScopedHandle_t = WindowScopedHandle<Window>;
 }

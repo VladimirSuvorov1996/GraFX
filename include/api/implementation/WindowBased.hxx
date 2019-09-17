@@ -6,7 +6,10 @@ namespace graFX::details {
 		using window_handle_ref_t = window_handle_t &;
 		WindowBased(window_handle_ref_t window_handle) :window_handle_(window_handle) {}
 	protected:
-		enum Mode { Cursor, StickyKeys, StickyMouseButtons };
+		enum class Mode { Cursor, StickyKeys, StickyMouseButtons };
+		static constexpr size_t to_index(Mode mode) {
+			return static_cast<size_t>(mode);
+		}
 
 		constexpr bool is_valid()const noexcept { return (nullptr != window_handle_); }
 		

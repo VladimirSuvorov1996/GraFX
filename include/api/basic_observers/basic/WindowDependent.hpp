@@ -3,6 +3,7 @@
 #include "../../Window.hpp"
 #include "AutosubscribableObserver.hpp"
 #include "ImplementationDependentObserver.hpp"
+#include "../implementation/ScopedHandle.hxx"
 namespace graFX::input {
 	template<auto invoke, typename Implementation, typename R, typename...As>
 	class WindowDependent :
@@ -20,7 +21,7 @@ namespace graFX::input {
 				R, Window&, As...>;
 
 			Window current_window;
-			details::WindowScopedHandle_t scope(current_window, w);
+			GRAFX_CAPTURE_SCOPED_HANDLE(current_window, w);
 			base_t::invoke_callback(current_window, std::forward<As>(as)...);
 		}
 	};

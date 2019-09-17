@@ -38,7 +38,7 @@ namespace graFX::window {
 			return { axes,static_cast<size_t>(count) };
 		}
 
-		//TODO: substitute with listener
+
 		using on_joystic_connected_cb = callbacks::on_joystic_connected_cb;
 		static on_joystic_connected_cb on_joystic_connected(on_joystic_connected_cb callback) {
 			return glfwSetJoystickCallback(callback);
@@ -49,16 +49,22 @@ namespace graFX::window {
 			return invoke_get<glfwGetJoystickGUID, GUID_t>(nullptr, slot_id_);
 		}
 		
-		bool is_gamepad()const {
+		
+		void get_joystic_hats() {
+			//glfwGetJoystickHats()
+
+		}
+
+		bool has_gamepad_mapping()const {
 			return invoke_get<glfwJoystickIsGamepad, bool>(false, slot_id_);
 		}
 		gamepad_name_t gamepad_name()const {
 			return glfwGetGamepadName(slot_id_);
 		}
-		
-		/*gamepad_name_t gamepad_name()const {
-			return glfwGetGamepadName(slot_id_);
-		}*/
+
+		static bool update_gamepad_mappings(gsl::czstring gamepad_mapping_ascii_string) {
+			return glfwUpdateGamepadMappings(gamepad_mapping_ascii_string);
+		}
 
 		using user_data_pointer_t = void*;
 		void set_user_pointer(user_data_pointer_t user_data) {
@@ -78,16 +84,12 @@ namespace graFX::window {
 		void invoke_set(Ts&&...as)const {			
 			if(is_valid())std::invoke(callable, std::forward<Ts>(as)...);
 		}
-		/*
-		template<typename Result, auto callable>
-		Result invoke_get()const noexcept {
-			int count;
-			auto data = std::invoke(callable, slot_id_, &count);
-			return { data,static_cast<size_t>(count) };
-		}
-		*/
 	protected:
 		
 		joystic_slot_id slot_id_;
 	};
+
+
+
 }
+
