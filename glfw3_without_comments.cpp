@@ -358,7 +358,7 @@ typedef void (* GLFWmonitorfun)(GLFWmonitor*,int);
 typedef void (* GLFWjoystickfun)(int,int);
 
 
-typedef struct GLFWvidmode {
+typedef struct GLFWvidmode {//DONE
     int width;
     int height;
 
@@ -368,20 +368,20 @@ typedef struct GLFWvidmode {
     int refreshRate;
 } GLFWvidmode;
 
-typedef struct GLFWgammaramp {
+typedef struct GLFWgammaramp {//DONE
     unsigned short* red;
     unsigned short* green;
     unsigned short* blue;
     unsigned int size;
 } GLFWgammaramp;
 
-typedef struct GLFWimage {
+typedef struct GLFWimage {//DONE (See Window Mouse)
     int width;
     int height;
     unsigned char* pixels;
 } GLFWimage;
 
-typedef struct GLFWgamepadstate {
+typedef struct GLFWgamepadstate {//DONE
     unsigned char buttons[15];
     float axes[6];
 } GLFWgamepadstate;
@@ -424,7 +424,7 @@ GLFWAPI int glfwWindowShouldClose(GLFWwindow* window);
 GLFWAPI void glfwSetWindowShouldClose(GLFWwindow* window, int value);
 GLFWAPI void glfwSetWindowTitle(GLFWwindow* window, const char* title);
 
-GLFWAPI void glfwSetWindowIcon(GLFWwindow* window, int count, const GLFWimage* images);//TO DO: PROVIDE SUPPORT FOR THIS
+GLFWAPI void glfwSetWindowIcon(GLFWwindow* window, int count, const GLFWimage* images);
 GLFWAPI void glfwGetWindowPos(GLFWwindow* window, int* xpos, int* ypos);
 GLFWAPI void glfwSetWindowPos(GLFWwindow* window, int xpos, int ypos);
 GLFWAPI void glfwGetWindowSize(GLFWwindow* window, int* width, int* height);
@@ -477,12 +477,12 @@ GLFWAPI int glfwGetKeyScancode(int key);
 GLFWAPI int glfwGetKey(GLFWwindow* window, int key);
 GLFWAPI int glfwGetMouseButton(GLFWwindow* window, int button);
 
-GLFWAPI void glfwGetCursorPos(GLFWwindow* window, double* xpos, double* ypos);//TO DO: PROVIDE SUPPORT FOR THIS
-GLFWAPI void glfwSetCursorPos(GLFWwindow* window, double xpos, double ypos);//TO DO: PROVIDE SUPPORT FOR THIS
-GLFWAPI GLFWcursor* glfwCreateCursor(const GLFWimage* image, int xhot, int yhot);//TO DO: PROVIDE SUPPORT FOR THIS
-GLFWAPI GLFWcursor* glfwCreateStandardCursor(int shape);//TO DO: PROVIDE SUPPORT FOR THIS
-GLFWAPI void glfwDestroyCursor(GLFWcursor* cursor);//TO DO: PROVIDE SUPPORT FOR THIS
-GLFWAPI void glfwSetCursor(GLFWwindow* window, GLFWcursor* cursor);//TO DO: PROVIDE SUPPORT FOR THIS
+GLFWAPI void glfwGetCursorPos(GLFWwindow* window, double* xpos, double* ypos);
+GLFWAPI void glfwSetCursorPos(GLFWwindow* window, double xpos, double ypos);
+GLFWAPI GLFWcursor* glfwCreateCursor(const GLFWimage* image, int xhot, int yhot);
+GLFWAPI GLFWcursor* glfwCreateStandardCursor(int shape);
+GLFWAPI void glfwDestroyCursor(GLFWcursor* cursor);
+GLFWAPI void glfwSetCursor(GLFWwindow* window, GLFWcursor* cursor);
 
 GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* window, GLFWkeyfun cbfun);
 GLFWAPI GLFWcharfun glfwSetCharCallback(GLFWwindow* window, GLFWcharfun cbfun);
@@ -499,7 +499,7 @@ GLFWAPI void glfwSetClipboardString(GLFWwindow* window, const char* string);
 GLFWAPI int glfwJoystickPresent(int jid);
 GLFWAPI const float* glfwGetJoystickAxes(int jid, int* count);
 GLFWAPI const unsigned char* glfwGetJoystickButtons(int jid, int* count);
-GLFWAPI const unsigned char* glfwGetJoystickHats(int jid, int* count);//TO DO: PROVIDE SUPPORT FOR THIS
+GLFWAPI const unsigned char* glfwGetJoystickHats(int jid, int* count);
 GLFWAPI const char* glfwGetJoystickName(int jid);
 GLFWAPI const char* glfwGetJoystickGUID(int jid);
 GLFWAPI void glfwSetJoystickUserPointer(int jid, void* pointer);
@@ -507,9 +507,9 @@ GLFWAPI void* glfwGetJoystickUserPointer(int jid);
 GLFWAPI int glfwJoystickIsGamepad(int jid);
 GLFWAPI GLFWjoystickfun glfwSetJoystickCallback(GLFWjoystickfun cbfun);
 
-GLFWAPI int glfwUpdateGamepadMappings(const char* string);//TO DO: PROVIDE SUPPORT FOR THIS
+GLFWAPI int glfwUpdateGamepadMappings(const char* string);
 GLFWAPI const char* glfwGetGamepadName(int jid);
-GLFWAPI int glfwGetGamepadState(int jid, GLFWgamepadstate* state);//TO DO: PROVIDE SUPPORT FOR THIS
+GLFWAPI int glfwGetGamepadState(int jid, GLFWgamepadstate* state);
 
 GLFWAPI const char* glfwGetClipboardString(GLFWwindow* window);
 

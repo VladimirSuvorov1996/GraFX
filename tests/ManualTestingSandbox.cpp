@@ -16,11 +16,12 @@ using fmt::report_system_error;
 
 #include "api/Monitor.hpp"
 #include "api/EventDispatcher.hpp"
-#include "api/basic_observers/basic/CallbackSignatures.hpp"
-#include "api/basic_observers/ResizeBasicObserver.hpp"
 #include "api/CreationParameter.hpp"
 #include "api/Action.hpp"
 #include "api/Connection.hpp"
+
+#include "api/basic_observers/basic/CallbackSignatures.hpp"
+#include "api/basic_observers/ResizeBasicObserver.hpp"
 
 #include "api/basic_observers/CursorMovedBasicObserver.hpp"
 #include "api/basic_observers/CursorEnteredBasicObserver.hpp"
@@ -40,6 +41,8 @@ using fmt::report_system_error;
 #include "api/basic_observers/MonitorConnectedBasicObserver.hpp"
 #include "api/basic_observers/ErrorBasicObserver.hpp"
 
+#include "api/Error.hpp"
+
 class MonConnObserver {
 public:
 	void on_con(graFX::Monitor m, bool is_conn) {
@@ -50,7 +53,7 @@ public:
 class ErrObserver {
 public:
 	void on_err(int code, std::string_view dsc) {
-		
+		graFX::Error error(code, dsc);
 	}
 
 };
@@ -97,9 +100,7 @@ GRAFX_REGISTRATE_OBSERVER_AS(File_s_DroppedBasicObserver, CustomObserver, on_fil
 
 #include <Windows.h>
 
-//TODO: Swap interval user pointer
-//TODO: make proper support for structs CURSOR IMAGE VIDEOMODE GAMMARAMP WINDOW PROC ADDRESS e.t.c.
-//TODO: <Window/Monitor>Traits -> to Window/Monitor
+
 //TODO: Error Class for (GLFW_BLA_BLA_BLA_ERROR) (like Action, Key, Etc)
 
 class CustomJoysticObserver {
@@ -122,17 +123,40 @@ int main(int argc, char* argv[]) {
 
 
 	using namespace graFX;
+	Monitor m(0);
+	
+	auto gr = m.gamma_ramp();
+	for (size_t i(0); i<gr.size(); ++i) {
+		std::cout<<"["<<i<<"]:"<<"r = "<<gr.red()[i]<<"\tg = "<<gr.green()[i]<<"\tb = "<<gr.blue()[i]<<std::endl;
+	}
+	
 
-	Monitor mon(345);
+
+
+	Monitor mon(365);
 	//std::cout<<"is_connected "<<mon.is_connected()<<std::endl;
 	auto vs = mon.available_videomodes();
 	std::cout<<"available_videomodes "<<vs.size()<<std::endl;
+	for (size_t i(0); i<vs.size(); ++i) {
+		std::cout
+			<<"Mode:\t["<<i<<"]"<<std::endl
+			<<"width\t= "<<vs[i].width()<<""<<std::endl
+			<<"height\t= "<<vs[i].height()<<""<<std::endl
+
+			<<"redBits\t= "<<vs[i].redBits()<<""<<std::endl
+			<<"greenBits\t= "<<vs[i].greenBits()<<""<<std::endl
+			<<"blueBits\t= "<<vs[i].blueBits()<<""<<std::endl
+			<<"refreshRate\t= "<<vs[i].refreshRate()<<""<<std::endl;
+	}
+
 	
 	auto s = mon.physical_size();
 	std::cout<<"physical_size "<<s.h<<std::endl;
 
 
 	Joystic j(0);
+
+		
 	
 	std::cout<<"GUID: "<<j.GUID()<<std::endl;
 
@@ -157,16 +181,20 @@ int main(int argc, char* argv[]) {
 	//c.enabled(true);	// step 2: enable|disable observer (not required to enable, cos enabled by default; disable to make useless)
 	
 
+	auto cursor = w.mouse().cursor();
 
-	assert(window::Mouse::CursorMode::Normal == w.mouse().cursor_mode());
+	assert(window::Cursor::Mode::Normal == cursor.mode());
 	assert(false == w.mouse().sticky_mouse_buttons());
 	assert(false == w.keyboard().sticky_keys());
 
 
 	for (; w.is_open(); w.eventDispatcher().poll_events()) {
+		w.properties().clipboard_string("buster");
+
 		w.render();
 		if (w.keyboard().is_key_pressed(Key::Space)) {	
 			w.request_attention();
+			
 		}
 		if (w.keyboard().is_key_pressed(Key::Escape)) {	
 			w.close();

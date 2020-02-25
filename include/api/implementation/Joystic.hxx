@@ -3,6 +3,43 @@
 #include "CallbackSignatures.hxx"
 
 namespace graFX::window {
+	class JoysticHats {
+	public:
+		enum hat_state {
+			Centred = 0,
+			Up = 1,
+			Right = Up<<1,
+			Down = Right<<1,
+			Left = Down<<1,
+			RightUp = Right|Up,
+			RightDown = Right|Down,
+			LeftUp = Left|Up,
+			LeftDown = Left|Down
+		};
+	public:
+		auto operator[](size_t hat_index)const {
+			return [=] (hat_state current_hat_state)->bool {
+				return (hats_[hat_index] & current_hat_state);
+			};
+		}
+	private:
+		JoysticHats(gsl::span<const uint8_t> hats) :
+			hats_(hats)
+		{}
+	private:
+		gsl::span<const uint8_t> hats_;
+		friend class Joystic;
+	};
+	struct GamepadState {
+
+
+		static constexpr size_t ButtonsCount = 15;
+		static constexpr size_t AxesCount = 6;
+		bool is_present_and_has_gamepad_mapping;
+		bool is_pressed[ButtonsCount];
+		float axis_value[AxesCount];		
+	};
+
 	class Joystic {
 	public:
 		using joystic_slot_id = callbacks::joystic_slot_id;
@@ -43,16 +80,28 @@ namespace graFX::window {
 		static on_joystic_connected_cb on_joystic_connected(on_joystic_connected_cb callback) {
 			return glfwSetJoystickCallback(callback);
 		}
-		
+		GamepadState state()const {
+			GamepadState state;
+			GLFWgamepadstate gamepad_state;
+			state.is_present_and_has_gamepad_mapping = (invoke_get<glfwGetGamepadState, int>(0, slot_id_, &gamepad_state) != 0);
+			if (state.is_present_and_has_gamepad_mapping) {
+				for (size_t axis_index(0); axis_index<state.AxesCount; ++axis_index)
+					state.axis_value[axis_index] = gamepad_state.axes[axis_index];
+				for (size_t button_index(0); button_index<state.ButtonsCount; ++button_index)
+					state.is_pressed[button_index] = (gamepad_state.buttons[button_index] == glfw::KeyPressed);
+			}
+			return state;
+		}
 		
 		GUID_t GUID()const {
 			return invoke_get<glfwGetJoystickGUID, GUID_t>(nullptr, slot_id_);
 		}
 		
 		
-		void get_joystic_hats() {
-			//glfwGetJoystickHats()
-
+		JoysticHats get_joystic_hats()const {
+			int count = 0;
+			auto hats = invoke_get<glfwGetJoystickHats, const uint8_t*>(nullptr, slot_id_, &count);
+			return JoysticHats({ hats, static_cast<size_t>(count) });
 		}
 
 		bool has_gamepad_mapping()const {

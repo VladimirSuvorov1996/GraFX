@@ -1,6 +1,7 @@
 #pragma once
 #include "Constants.hxx"
 #include "WindowBased.hxx"
+#include "Image.hxx"
 #include "Monitor.hxx"
 namespace graFX::window {
 	class Properties : protected details::WindowBased {
@@ -97,7 +98,21 @@ namespace graFX::window {
 		void set_parameter(CreationParameter parameter)const {
 			invoke_set<glfwSetWindowAttrib>(window_handle_, parameter.hint(), parameter.value());
 		}
+		void set_icon(gsl::span<TinyImage> icon_s) {
+			if (icon_s.size()) {
+				if (icon_s.size()>1) {
+					std::vector<GLFWimage> image_s;
+					image_s.resize(icon_s.size());
+					for (std::size_t index(0); index < icon_s.size(); ++index)
+						image_s[index] = icon_s[index];
 
+					invoke_set<glfwSetWindowIcon>(window_handle_, image_s.size(), image_s.data());
+				} else {
+					GLFWimage image = icon_s[0];
+					invoke_set<glfwSetWindowIcon>(window_handle_, icon_s.size(), &image);
+				}
+			} else invoke_set<glfwSetWindowIcon>(window_handle_, 0, nullptr);
+		}
 
 		//just a flag, useful to check
 		bool should_close() const {

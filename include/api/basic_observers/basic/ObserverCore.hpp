@@ -10,13 +10,18 @@ namespace graFX::input::observer_core {
 			T,
 			T&>;
 
+
 		void add(instance_t observer) {
-			if (std::find(std::begin(observers_), std::end(observers_), observer) == std::end(observers_))
+			using namespace std;
+			if (find(begin(), end(), to_pointer(observer)) == end())
 				observers_.emplace_back(observer);
 		}
 		void remove(instance_t observer) {
-			if (auto found = std::find(std::begin(observers_), std::end(observers_), observer); found != std::end(observers_))
-				observers_.erase(found, found + 1);
+			using namespace std;
+			if (auto found = find(begin(), end(), to_pointer(observer)); found != end()) {
+				swap(observers_[found-begin()], observers_.back());
+				observers_.pop_back();
+			}//observers_.erase(found, found + 1);
 			else observers_.shrink_to_fit();
 		}
 
@@ -54,8 +59,17 @@ namespace graFX::input::observer_core {
 		decltype(auto) crend()const noexcept {
 			return observers_.crend();
 		}
-
+		
 	private:
-		C<T> observers_;
+		using pointer_t =  std::conditional_t<std::is_pointer_v<T>, T, T*>;
+		static constexpr pointer_t to_pointer(instance_t instance) {
+			if constexpr (std::is_pointer_v<T>) {
+				return instance;
+			} else {
+				return &instance;
+			}
+		}
+	private:
+		C<pointer_t> observers_;
 	};
 }

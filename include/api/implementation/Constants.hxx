@@ -179,6 +179,7 @@ namespace glfw {
 		GLFW_KEY_LAST
 	};
 	static constexpr error_t errors[]{
+		GLFW_NO_ERROR,
 		GLFW_NOT_INITIALIZED,
 		GLFW_NO_CURRENT_CONTEXT,
 		GLFW_INVALID_ENUM,

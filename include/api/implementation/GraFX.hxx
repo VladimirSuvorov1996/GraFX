@@ -62,10 +62,12 @@ namespace graFX {
 			return { extensions,count };
 		}
 		using on_error_cb = callbacks::on_error_cb;
-		//TODO: substitute with listener
+
 		static on_error_cb on_error(on_error_cb callback) {
 			return glfwSetErrorCallback(callback);
 		}
+
+
 
 	protected:
 		inline static bool is_valid_ = false;
