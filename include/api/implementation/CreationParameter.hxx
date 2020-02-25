@@ -98,6 +98,7 @@ namespace graFX {
 
 
 
+	using ForwardCompatibility = CreationFlag<creation_parameter_t::ForwardCompatibility>;
 //using Maximized = CreationFlag<creation_parameter_t::Maximized>;
 
 	

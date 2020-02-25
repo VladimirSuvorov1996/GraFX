@@ -26,11 +26,14 @@ namespace glfw {
 		GLFW_OPENGL_PROFILE,
 		GLFW_CONTEXT_VERSION_MAJOR,
 		GLFW_CONTEXT_VERSION_MINOR
+#if 0
+		,GLFW_FSAA_SAMPLES
+#endif
 	};
 	static constexpr value_t profile[]{
 		GLFW_OPENGL_ANY_PROFILE,
 		GLFW_OPENGL_CORE_PROFILE,
-		GLFW_OPENGL_COMPAT_PROFILE
+		GLFW_OPENGL_COMPAT_PROFILE		
 	};
 	static constexpr input_mode_t input_modes[]{
 		GLFW_CURSOR,
