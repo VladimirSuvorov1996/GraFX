@@ -28,10 +28,15 @@ namespace graFX {
 		window_handle_t window_handle_ = nullptr;
 	public:
 
-		Keyboard keyboard()const { return { const_cast<Window*>(this)->window_handle_ }; }
-		Mouse mouse()const { return { const_cast<Window*>(this)->window_handle_ }; }
-		Properties properties()const { return { const_cast<Window*>(this)->window_handle_ }; }
-		EventDispatcher event_dispatcher() { return { const_cast<Window*>(this)->window_handle_ }; }
+		Keyboard keyboard() { return { window_handle_ }; }
+		Mouse mouse() { return { window_handle_ }; }
+		Properties properties() { return { window_handle_ }; }
+		EventDispatcher event_dispatcher() { return { window_handle_ }; }
+
+		const Keyboard keyboard()const noexcept{ return { const_cast<Window*>(this)->window_handle_ }; }
+		const Mouse mouse()const noexcept{ return { const_cast<Window*>(this)->window_handle_ }; }
+		const Properties properties()const noexcept{ return { const_cast<Window*>(this)->window_handle_ }; }
+		const EventDispatcher event_dispatcher()const noexcept { return { const_cast<Window*>(this)->window_handle_ }; }
 		//*CREATION
 		Window() = default;
 		Window(const Window&) = delete;
