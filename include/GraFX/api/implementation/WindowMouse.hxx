@@ -81,8 +81,12 @@ namespace graFX::window {
 		using on_mouse_button_cb = callbacks::on_mouse_button_cb;
 
 		Mouse(window_handle_ref_t base) : WindowBased(base) {}
-		
-		//buggy two
+		Mouse(Mouse&& src) : WindowBased(src.window_handle_) {}
+
+		const Mouse& operator=(Mouse&& src) {
+			window_handle_ = src.window_handle_;
+		}
+
 		bool sticky_mouse_buttons()const {
 			return (is_valid()) ? glfwGetInputMode(window_handle_, glfw::input_modes[to_index(Mode::StickyMouseButtons)]) : false;
 		}
@@ -152,24 +156,24 @@ namespace graFX::window {
 	};
 
 	
-		Cursor::Mode Cursor::mode()const {
-			return mouse_.cursor_mode();
-		}
-		void Cursor::mode(Cursor::Mode mode) {
-			const_cast<Mouse&>(mouse_).cursor_mode(mode);
-		}
+	inline Cursor::Mode Cursor::mode()const {
+		return mouse_.cursor_mode();
+	}
+	inline void Cursor::mode(Cursor::Mode mode) {
+		const_cast<Mouse&>(mouse_).cursor_mode(mode);
+	}
 		
 
-		void Cursor::position(double x, double y) {
-			const_cast<Mouse&>(mouse_).set_cursor_position(x, y);
-		}
-		Cursor::position_t Cursor::position()const {
-			return mouse_.get_cursor_position();
-		}
-		Cursor::on_cursor_moved_cb Cursor::on_moved(Cursor::on_cursor_moved_cb callback) {
-			return const_cast<Mouse&>(mouse_).on_cursor_moved(callback);
-		}
-		Cursor::on_cursor_enter_cb Cursor::on_entered(Cursor::on_cursor_enter_cb callback) {
-			return const_cast<Mouse&>(mouse_).on_cursor_entered(callback);
-		}
+	inline void Cursor::position(double x, double y) {
+		const_cast<Mouse&>(mouse_).set_cursor_position(x, y);
+	}
+	inline Cursor::position_t Cursor::position()const {
+		return mouse_.get_cursor_position();
+	}
+	inline Cursor::on_cursor_moved_cb Cursor::on_moved(Cursor::on_cursor_moved_cb callback) {
+		return const_cast<Mouse&>(mouse_).on_cursor_moved(callback);
+	}
+	inline Cursor::on_cursor_enter_cb Cursor::on_entered(Cursor::on_cursor_enter_cb callback) {
+		return const_cast<Mouse&>(mouse_).on_cursor_entered(callback);
+	}
 }

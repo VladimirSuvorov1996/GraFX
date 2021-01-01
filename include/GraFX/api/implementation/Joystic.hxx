@@ -1,5 +1,5 @@
 #pragma once
-#include <gsl-lite.hpp>
+#include "guidelines_support_library_selector.hxx"
 #include "CallbackSignatures.hxx"
 
 namespace graFX::window {

@@ -8,7 +8,7 @@ namespace graFX::input {
 		public BasicObserver {
 	protected:
 		R invoke_callback(As...as) {
-			(this->*invoke)(std::forward<As>(as)...);
+			return (this->*invoke)(std::forward<As>(as)...);
 		}
 	};
 }

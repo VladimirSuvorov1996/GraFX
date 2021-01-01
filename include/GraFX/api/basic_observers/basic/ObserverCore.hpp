@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 namespace graFX::input::observer_core {
 	template<typename T, template<typename...Ts>class C = std::vector>
 	class ObserverCore {

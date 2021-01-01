@@ -1,5 +1,5 @@
 #pragma once
-#include "GraFX/api/basic_observers/basic/ObserverCore.hpp"
+#include "../basic_observers/basic/ObserverCore.hpp"
 #include "Constants.hxx"
 
 

@@ -1,8 +1,8 @@
 #pragma once
-#include <gsl-lite.hpp>
+#include "guidelines_support_library_selector.hxx"
 #include "GraFX.hxx"
 #include "Constants.hxx"
-#include "GraFX/api/basic_observers/basic/ObserverCore.hpp"
+#include "../basic_observers/basic/ObserverCore.hpp"
 #include "CallbackSignatures.hxx"
 #include "ScopedHandle.hxx"
 
@@ -453,14 +453,14 @@ namespace graFX {
 	
 	};
 	
-	videomode_traits::videomode_t CurrentVideoMode::videomode()const noexcept { 
+	inline videomode_traits::videomode_t CurrentVideoMode::videomode()const noexcept { 
 		return monitor_.get_current_videomode();
 	}
-	AvailableVideoModes::available_videomodes_t AvailableVideoModes::available_videomodes()const noexcept {
+	inline AvailableVideoModes::available_videomodes_t AvailableVideoModes::available_videomodes()const noexcept {
 		return monitor_.get_available_videomodes();
 	}
 	
-	GammaRamp::const_gamma_ramp_pointer GammaRamp::gamma_ramp()const noexcept{
+	inline GammaRamp::const_gamma_ramp_pointer GammaRamp::gamma_ramp()const noexcept{
 		return monitor_->get_gamma_ramp();
 	}
 

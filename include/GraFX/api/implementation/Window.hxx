@@ -1,14 +1,14 @@
 #pragma once
 #include "window_handle.hxx"
 #include "GraFX.hxx"
-#include "GraFX/api/basic_observers/basic/ObserverCore.hpp"
+#include "../basic_observers/basic/ObserverCore.hpp"
 #include "CallbackSignatures.hxx"
 #include "Monitor.hxx"
 #include "WindowKeyboard.hxx"
 #include "WindowMouse.hxx"
 #include "WindowProperties.hxx"
 #include "WindowEventDispatcher.hxx"
-#include "CreationParameter.hxx"//NOTE BEFORE WINDOW IS INCLUDED, so WindowMaker doesn't correct
+#include "CreationParameter.hxx"
 
 
 namespace graFX {
@@ -91,7 +91,8 @@ namespace graFX {
 		void iconify() { invoke_set<glfwIconifyWindow>(window_handle_); }
 		void maximize() { invoke_set<glfwMaximizeWindow>(window_handle_); }
 		void restore() { invoke_set<glfwRestoreWindow>(window_handle_); }
-		void set_context_current() { invoke_set<glfwMakeContextCurrent>(window_handle_); }
+		void acquire_context() { invoke_set<glfwMakeContextCurrent>(window_handle_); }
+		static void release_context() { glfwMakeContextCurrent(nullptr); }
 		void focus() { invoke_set<glfwFocusWindow>(window_handle_); }
 		
 		struct traits {
@@ -149,7 +150,7 @@ namespace graFX {
 		}
 		friend class current_context_window_t;
 	};
-	CurrentContext Window::get_current_context() {
+	inline CurrentContext Window::get_current_context() {
 		return { (GraFX::is_valid()) ? glfwGetCurrentContext() : nullptr };
 	}
 
@@ -201,12 +202,12 @@ namespace graFX {
 		std::vector<CreationParameter> creation_parameters_;
 		friend WindowMaker& operator<<(WindowMaker& maker, const CreationParameter& parameter);
 	};
-	WindowMaker& operator<<(WindowMaker& maker, const graFX::CreationParameter& parameter) {
+	inline WindowMaker& operator<<(WindowMaker& maker, const graFX::CreationParameter& parameter) {
 		maker.creation_parameters_.emplace_back(parameter);
 		return maker;
 	}
 	template<typename Callable>
-	auto operator<<(WindowMaker& to, Callable callable)->decltype(std::invoke(callable, to)) {
+	inline auto operator<<(WindowMaker& to, Callable callable)->decltype(std::invoke(callable, to)) {
 		return std::invoke(callable, to);
 	}
 }

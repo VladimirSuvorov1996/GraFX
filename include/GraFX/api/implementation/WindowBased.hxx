@@ -14,11 +14,13 @@ namespace graFX::details {
 		constexpr bool is_valid()const noexcept { return (nullptr != window_handle_); }
 		
 		template<auto callable, typename R, typename...Ts>
-		R invoke_get(R defaultValue, Ts&&...as)const {			
+		R invoke_get(R defaultValue, Ts&&...as)const {
+			assert(is_valid());
 			return (is_valid())?std::invoke(callable, std::forward<Ts>(as)...):defaultValue;
 		}
 		template<auto callable, typename...Ts>
-		void invoke_set(Ts&&...as)const {			
+		void invoke_set(Ts&&...as)const {
+			assert(is_valid());
 			if(is_valid())std::invoke(callable, std::forward<Ts>(as)...);
 		}
 	protected:

@@ -1,5 +1,5 @@
 #pragma once
-#include <gsl-lite.hpp>
+#include "../implementation/guidelines_support_library_selector.hxx"
 #include "CallbackSignatures.hxx"
 #include "../implementation/CreationParameter.hxx"
 
@@ -7,7 +7,8 @@ namespace graFX {
 	class GraFX {
 	public:
 		using procedure_name_t = gsl::czstring;
-		static auto get_procedure_address(procedure_name_t procedure_name) {
+		using procedure_address_t = void(*)();
+		static procedure_address_t get_procedure_address(procedure_name_t procedure_name) {
 			return glfwGetProcAddress(procedure_name);
 		}
 
@@ -99,9 +100,4 @@ namespace graFX {
 	static_assert(sizeof(graphic_output_tvec2i) == (2 * sizeof(int)));
 	static_assert(sizeof(graphic_output_tvec2f) == (2 * sizeof(float)));
 	static_assert(sizeof(graphic_output_trect2i) == (4 * sizeof(int)));
-#ifndef GRAFX_DONT_USE_AUTOINITIALIZE
-	namespace {
-		static GraFX graphics;
-	}
-#endif // !GRAFX_DONT_USE_AUTOINITIALIZE
 }
